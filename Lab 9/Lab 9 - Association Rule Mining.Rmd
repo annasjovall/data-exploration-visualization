@@ -1,0 +1,88 @@
+---
+title: "Lab 9"
+author: "Anna Palmqvist Sjövall"
+date: "3 oktober 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# upload data
+```{r}
+data <- read.csv("data1.csv", header=TRUE, stringsAsFactors=FALSE)
+data
+minSupp <- 2
+```
+
+# Step 1. Calculate the support/frequent of all items.
+```{r}
+c1 <- data.frame(colSums(data[-1])) #Ignore Transaction ID
+colnames(c1) <- "SupportFrequent"
+c1
+```
+
+# Step 2. Discard the items with the support less than the pre-defined threshold.
+```{r}
+c1 <- subset(c1, c1$SupportFrequent >= minSupp)
+c1
+```
+
+# Step 3. Combine two items and calculate their support/frequent.
+```{r}
+names <- rownames(c1)
+#Get all permutations
+permutations <- (merge(names, names))
+#Filter out when x==y and same permutations
+c2 <- subset(permutations, permutations[1] != permutations[2] & duplicated(t(apply(permutations, 1, sort))))
+
+#Takes a list of items and returns the number of times they are found together in data.
+freqInData <- function(x) {
+  df <- data.frame(matrix(ncol = length(x), nrow = dim(data)[1]))
+  for(i in 1:length(x)){
+    df[i] <- data[x[i]]
+  }
+  sum(Reduce('+', df) == length(x))
+}
+
+c2$SupportFrequent <- apply(c2, 1, freqInData)
+c2
+
+```
+
+# Step 4. Discard the items with the support less than the pre-defined threshold.
+```{r}
+c2 <- subset(c2, c2$SupportFrequent >= minSupp)
+c2
+```
+
+
+# Step 5. Combine three items and calculate their support/frequent.
+```{r}
+#We need the x value (could have also chosen y) to be equal to form the trio
+equalX <- split(c2, c2$x)
+dataFrames <- equalX[sapply(equalX, nrow) >= 2]
+nbrDataFrames <- length(sapply(dataFrames, length))
+c3 <- matrix(NA, nrow = nbrDataFrames, ncol = 3)
+
+#Go through all possible trios and form them
+for(i in 1:nbrDataFrames) {
+  elemX <- toString(dataFrames[[i]]$x[1])
+  elemY <- unlist(strsplit(toString(dataFrames[[i]]$y), ", "))
+  c3[i,] <- c(elemX, elemY)
+}
+
+c3 <- data.frame(c3)
+c3$SupportFrequent <- apply(c3, 1, freqInData)
+c3
+
+```
+
+# Step 6. Discard the items with the support less than the pre-defined threshold.
+
+```{r}
+c3 <- subset(c3, c3$SupportFrequent >= minSupp)
+c3
+```
+

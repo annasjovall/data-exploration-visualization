@@ -1,0 +1,44 @@
+---
+title: "Lab 5- Task 2"
+author: "Anna Palmqvist Sjövall"
+date: "30 augusti 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=15)
+```
+
+```{r}
+# upload data
+data <- read.csv("house_data.csv", header=TRUE, stringsAsFactors=FALSE)
+X <- data$sqft_living
+Y <- data$price
+```
+
+#1. Calculate Yest= ??0 + ??1 * X
+```{r}
+beta1 <- cor(X,Y) * sd(Y) / sd(X)
+beta0 <- mean(Y) - beta1 * mean(X)
+Y_est <- beta0 + beta1*X
+head(Y_est)
+```
+
+#2. Display the Yest
+```{r}
+plot (X,Y)
+lines(X, Y_est)
+```
+
+#3. Calculate the error: Error= price Y- Yest
+```{r}
+error <- Y - Y_est
+head(error)
+```
+
+#4. Calculate Root Mean Squared Error (RMSE):
+```{r}
+RMSE <- sqrt(sum((Y_est - Y)^2) / length(Y))
+RMSE
+```

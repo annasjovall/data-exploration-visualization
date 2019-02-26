@@ -1,0 +1,76 @@
+---
+title: "Lab 6 - Part 2"
+author: "Anna Palmqvist Sjövall"
+date: "6 september 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 2. Load college-admissions from you working directory (folder).
+```{r}
+# upload data
+data <- read.csv("college-admissions.csv", header=TRUE, stringsAsFactors=FALSE)
+head(data)
+```
+
+# 3. Normalise data X1 and X2 using Min Max method.
+```{r}
+data$X1 <- (data$X1 - min(data$X1))/(max(data$X1) - min(data$X1))
+data$X2 <- (data$X2 - min(data$X2))/(max(data$X2) - min(data$X2))
+head(data)
+```
+
+# 4. Apply Logistic Regression using b0=-0.0375, b1=-0.104290635, b2=-0.09564513761.
+```{r}
+b0 <- -0.0375
+b1 <- -0.104290635
+b2 <- -0.09564513761
+data$z <- b0 + b1*data$X1 + b2*data$X2
+data$Y_est <- 1/(1 + exp(-data$z))
+data
+```
+
+# 5. Convert Yest into "0" and "1" as follows: if Yest <0.5 Yest =0 Else Yest=1
+```{r}
+data$Y_est <- ifelse(data$Y_est<0.5, 0, 1)
+data
+```
+
+# 6. Calculate accuracy: Accuracy = (correct predictions / No. predictions made) * 100.
+```{r}
+correct <- sum(data$Y == data$Y_est)
+accuracy <- (correct / length(data$Y))*100
+accuracy
+```
+
+# 7. Apply above GDA steps with different update rules as follows: 
+```{r}
+theta <- 0.01
+N <- length(data$Y)
+
+for (i in 1:300) {
+  SSE_b0 <- sum(data$Y_est - data$Y)/N
+  SSE_b1 <- sum((data$Y_est - data$Y)*data$X1)/N
+  SSE_b2 <- sum((data$Y_est - data$Y)*data$X2)/N
+  b0 = b0 - (theta*SSE_b0)
+  b1 = b1 - (theta*SSE_b1)
+  b2 = b2 - (theta*SSE_b2)
+  
+  #Calculate z
+  data$z = b0 + (b1*data$X1) + (b2*data$X2)
+  #Calculate new Y_est
+  data$Y_est <- 1/(1+exp(-data$z))
+}
+data$Y_est <- ifelse(data$Y_est<0.5, 0, 1)
+data
+```
+
+# 8. Calculate accuracy: Accuracy = (correct predictions / No predictions made) * 100.
+```{r}
+correct <- sum(data$Y == data$Y_est)
+accuracy <- (correct / length(data$Y))*100
+accuracy
+```

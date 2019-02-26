@@ -1,0 +1,132 @@
+---
+title: "Task 1"
+author: "Anna Palmqvist Sjövall"
+date: "7 september 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Download house_data from LMS and save it in your PC (working directory (folder)).
+```{r}
+# upload data
+d <- read.csv("house_data.csv", header=TRUE, stringsAsFactors=FALSE)
+head(d)
+```
+
+# 2. The data has 12 columns. 
+columns 1 to 11 are independent variables (X1 to X11). Column 12 is the dependent variable (Y).
+
+# 3. Remove inconsistence data from some ROWS. 
+  - For example, "bathrooms" values should be integer only (for example, 1, 2, 4, 5, ...etc). 
+  - If any row in "bathrooms" contains a real number (1.2, 3.4, 7.3, . etc), remove the completer row from the dataset. 
+  - Please check other COLUMNS carefully. If you think any one of these columns should contains integer values only, remove the row(s) that contains real value(s). Write a code to perform the checking and removing process. 
+```{r}
+#Returns true if x is integer, false if it is a real value.
+is_integer <- function(x) {
+  x == round(x)
+}
+#Remove rows that contains real values in 'bathrooms' and 'floors'
+d <- d[is_integer(d$bathrooms) & is_integer(d$floors),]
+head(d)
+```
+
+# 4. Perform the following Data Exploration processes 
+  - Median: for all columns 
+  - Range: for all columns 
+  - Frequency: for the following columns ONLY: "bathrooms", "floors", "condition", "grade".
+```{r}
+apply(d, 2, median)
+apply(d, 2, range)
+
+cols <- c('bathrooms', 'floors', 'condition', 'grade')
+freq <- apply(d[cols], 2, table)
+freq
+```
+
+# 5. Check if the there are any "missing values" in the data. 
+  - If you found "missing value", use "mean" to replace the "missing value" for real value and "min" for integer value.
+```{r}
+#Check if any 'NA'
+any(is.na(d))
+
+#All elements in the data have integer values, as shown by the line of code below, thus will use min (not mean) to replace them
+all(is_integer(d), na.rm = TRUE)
+
+#Replaces 'NA' values with the minimum value
+replace_na <- function(x) {
+  replace(x, is.na(x), min(x, na.rm = TRUE))
+}
+
+d <- as.data.frame(lapply(d, replace_na))
+
+#Check if there is any 'NA' values left
+any(is.na(d))
+```
+
+# 6. Check all columns value ranges. 
+  - If you think normalisation is needed, use the "Min-Max" method.
+```{r}
+#Column value range
+apply(d, 2, range)
+
+#Returns x normalized according to min-max method
+min_max <- function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+
+#All data is normalized
+d <- as.data.frame(lapply(d, min_max))
+head(d)
+```
+
+# 7. Apply a proper regression model -- either Binary Logistic Regression or Linear Regression. You need to think which one best fit with this dataset. 
+  - Use the following for the selected model:
+  - Assign random values to all Beta (B0 to B11) parameters. All random values MUST be real values between "0" and "1". Make SURE all parameters (B0 to B11) DO NOT have the same VALUE.
+  - Use "Yest" for the predicated (estimated) value. Do not use different name.
+  - Preform the steps of selected regression model.
+  - If you selected Binary Logistic Regression, you need to calculate and print the accuracy. If you selected Linear Regression, you need to calculate and print the Sum of Squared Errors (SSE).
+```{r}
+#Using linear regression as we do not need to classify price as 0 or 1, but actually estimate a value
+b0 <- 0.01
+beta <- c(0.02, 0.02, 0.04, 0.05, 0.06, 0.065, 0.07, 0.075, 0.08, 0.09, 0.095)
+
+X <- d[1:11]
+Y <- d$price
+
+Yest <- b0 + (beta[1]*X[1]) + (beta[2]*X[2]) + (beta[3]*X[3]) + (beta[4]*X[4]) + (beta[5]*X[5]) + (beta[6]*X[6]) + (beta[7]*X[7]) + (beta[8]*X[8]) + (beta[9]*X[9]) + (beta[10]*X[10]) + (beta[11]*X[11])
+
+#SSE
+0.5*sum((Yest - Y)^2)
+```
+
+#8. Apply Gradient Descent Algorithm (GDA) to optimise the selected regression model for 500 iterations.
+  - Set Theta into 0.01
+  - Use the following to calculate the partial derivative for Beta parameters:
+  - For B0: B0 = (1/No. of samples) * sum (Yest - Y)
+  - For other parameters (B1 to B11): Bi = (1/No. of samples) * sum ((Yest - Y) *Xi)
+```{r}
+N <- length(Y)
+theta <- 0.01
+
+for (i in 1:500) {
+  #B0
+  par_der <- sum(Yest - Y)/N
+  b0 <- b0 - (theta*par_der)
+  
+  #B0 to B11
+  for (j in 1:length(beta)) {
+    par_der <- (sum((Yest - Y)*X[j]))/N
+    beta[j] <- beta[j] - (theta*par_der)
+  }
+  Yest <- b0 + (beta[1]*X[1]) + (beta[2]*X[2]) + (beta[3]*X[3]) + (beta[4]*X[4]) + (beta[5]*X[5]) + (beta[6]*X[6]) + (beta[7]*X[7]) + (beta[8]*X[8]) + (beta[9]*X[9]) + (beta[10]*X[10]) + (beta[11]*X[11])
+}
+```
+
+# 9. Print the final results based on the selected regression model: either accuracy or SSE.
+```{r}
+#SSE
+0.5*sum((Yest - Y)^2)
+```

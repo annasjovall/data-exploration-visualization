@@ -1,0 +1,98 @@
+---
+title: "Task 2"
+author: "Anna Palmqvist Sjövall"
+date: "7 september 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Download pima-indians-diabetes.data from LMS and save it in your PC (working directory (folder)).
+```{r}
+# upload data
+d <- read.csv("pima-indians-diabetes.data.csv", header=TRUE, stringsAsFactors=FALSE)
+head(d)
+```
+
+# 2. The data has 9 columns. columns 1 to 8 are independent variables (X1 to X8). Column 9 is the dependent variable (Y).
+
+# 3. Perform the following Data Exploration processes:
+  - Median: for all columns
+  - Range: for all columns.
+```{r}
+apply(d, 2, median)
+apply(d, 2, range)
+```
+
+# 4. Check all columns value ranges. If you think normalisation is needed, use the "Min-Max" method.
+```{r}
+#Function that normalizes x according to min-max method
+min_max <- function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+
+#Normalize all data
+d <- as.data.frame(lapply(d, min_max))
+head(d)
+```
+
+# 5. Apply a proper regression model -- either Binary Logistic Regression or Linear Regression. You need to think which one best fit with this dataset. Use the following for the selected model:
+  - Assign random values to all Beta (B0 to B8) parameters. All random values MUST be real values between "0" and "1". Make SURE all parameters (B0 to B8) DO NOT have the same VALUE.
+  - Use "Yest" for the predicated (estimated) value. Do not use different name.
+  - Preform the steps of selected regression model.
+  - If you selected Binary Logistic Regression, you need to calculate and print the accuracy. If you selected Linear Regression, you need to calculate and print the Sum of Squared Errors (SSE).
+```{r}
+#Y has binary values, thus uses binary logistic regression.
+b0 <- 0.01
+beta <- c(0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09)
+
+X <- d[1:8]
+Y <- d$Y
+
+z <- b0 + (beta[1]*X[1]) + (beta[2]*X[2]) + (beta[3]*X[3]) + (beta[4]*X[4]) + (beta[5]*X[5]) + (beta[6]*X[6]) + (beta[7]*X[7]) + (beta[8]*X[8])
+
+Yest <- 1/(1 + exp(-z))
+
+#Makes sure Yest has binary values
+Yest <- ifelse(Yest<0.5, 0, 1)
+
+#Calculates accuracy: Accuracy = (correct predictions / No. predictions made) * 100.
+acc <- function(y, y_est) {
+  ((sum(y == y_est)) / length(y))*100
+}
+
+acc(Y, Yest)
+```
+
+# 6. Apply Gradient Descent Algorithm (GDA) to optimise the selected regression model for 500 iterations.
+  - Set Theta into 0.01. 
+  - Use the following to calculate the partial derivative for Beta parameters:
+  - For B0: B0 = (1/No. of samples) * sum(Yest - Y)
+  - For other parameters (B1 to B8): Bi = (1/No. of samples) * sum ((Yest - Y)Xi)
+```{r}
+theta <- 0.01
+N <- length(Y)
+
+for (i in 1:500) {
+  #B0
+  par_der <- sum(Yest - Y)/N
+  b0 <- b0 - (theta*par_der)
+  
+  #B1 to B8
+  for (j in 1:length(beta)) {
+    par_der <- sum((Yest - Y) * X[j])/N
+    beta[j] <- beta[j] - (theta*par_der)
+  }
+  
+  z <- b0 + (beta[1]*X[1]) + (beta[2]*X[2]) + (beta[3]*X[3]) + (beta[4]*X[4]) + (beta[5]*X[5]) + (beta[6]*X[6]) + (beta[7]*X[7]) + (beta[8]*X[8])
+  Yest <- 1/(1 + exp(-z))
+}
+Yest <- ifelse(Yest<0.5, 0, 1)
+```
+
+# 7. Print the final results based on the selected regression model: either accuracy or SSE.
+```{r}
+acc(Y, Yest)
+```

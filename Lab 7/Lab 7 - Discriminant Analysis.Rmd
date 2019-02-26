@@ -1,0 +1,76 @@
+---
+title: "Lab 7 - Discriminant analysis"
+author: "Anna Palmqvist Sjövall"
+date: "11 september 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. You need to separate the data into two classes (c): c1=N and c2=Y.
+```{r}
+# upload data
+data <- read.csv("Spam.csv", header=TRUE, stringsAsFactors=FALSE)
+#data
+classes <- split(data, data$Y)
+c1 <- classes[[1]] #c1<- data[data$Y=='N',]
+c2 <- classes[[2]]
+```
+
+# 2. Calculate the mean (average) vectors, covariance matrices and class probabilities.
+```{r}
+#Class N
+n1 <- length(c1$Y)
+n1
+c1_P <- n1/length(data$Y)
+c1_P
+c1_uX1 <- mean(c1$X1)
+c1_uX1
+c1_uX2 <- mean(c1$X2)
+c1_uX2
+c1_cov <- cov(c1[, 1:2])
+c1_cov
+
+#Class Y
+n2 <- length(c2$Y)
+n2
+c2_P <- n2/length(data$Y)
+c2_P
+c2_uX1 <- mean(c2$X1)
+c2_uX1
+c2_uX2 <- mean(c2$X2)
+c2_uX2
+c2_cov <- cov(c2[, 1:2])
+c2_cov
+```
+
+# 3. Calculate the pooled covariance matrix and the coefficients of the model.
+```{r}
+c <- (1 / (n1 + n2))*((n1*c1_cov) + (n2*c2_cov))
+c
+b <- solve(c)%*%(c(c1_uX1, c1_uX2) - c(c2_uX1, c2_uX2))
+b
+z <- (b[1,1]*data$X1) + (b[2,1]*data$X2)
+data$Z <- z
+```
+
+# 4. Calculate Z0
+```{r}
+z0 <- (b[1,1]*((c1_uX1 + c2_uX1)/2)) + (b[2,1]*((c1_uX2 + c2_uX2)/2))
+z0
+l <- -log(c1_P/c2_P)
+l
+data$Yest <-ifelse(z-z0 > l, 'N','Y')
+data['Z-Z0'] <- z - z0
+data
+```
+
+# 5. Calculate the accuracy: accuracy= (No. of correct / Total)*100. Accuracy= 85
+```{r}
+correct <- sum(data$Y == data$Yest)
+accuracy <- (correct / length(data$Y))*100
+accuracy
+```
+

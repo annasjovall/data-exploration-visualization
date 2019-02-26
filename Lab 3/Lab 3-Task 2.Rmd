@@ -1,0 +1,207 @@
+---
+title: "Lab 3"
+author: "CSE5DEV"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Welcome to CSE5DEV**
+
+You need to download the R code files and datasets into your working folder (current directory)
+
+
+This lab will cover Lecture 2 and Lecture 3. 
+
+
+## Task 2 - Lecture 3: Data Cleaning & Normalisation. 
+
+We will perfrom the following stpes:
+
+- Data Cleaning.
+- Data Transformation
+- Data Normalisation.
+
+## Code chunks
+
+## Load the dataset
+
+We will look at dirty_iris.csv data
+
+```{r}
+# upload dirty_iris.csv data
+dirty_iris <- read.csv("dirty_iris.csv", header=TRUE, stringsAsFactors=FALSE)
+dirty_iris
+
+```
+## Call is.na() on the full dirty_iris to spot all NAs
+```{r}
+is.na(dirty_iris)
+```
+## Call is.na() on the full Species feature to spot all NAs
+
+
+```{r}
+is.na(dirty_iris$Species)
+```
+## Use the any() function to ask whether there are any NAs in the data
+```{r}
+any(is.na(dirty_iris))
+```
+## View a summary() of the dataset
+```{r}
+summary(dirty_iris)
+
+```
+
+
+
+## Replace all empty strings in status with NA
+```{r}
+dirty_iris$Sepal.Length[dirty_iris$Sepal.Length == ""] <- NA
+dirty_iris$ Sepal.Width [dirty_iris$ Sepal.Width == ""] <- NA
+dirty_iris$ Petal.Length[dirty_iris$ Petal.Length == ""] <- NA
+dirty_iris$Petal.Width [dirty_iris$Petal.Width == ""] <- NA
+dirty_iris$Species[dirty_iris$Species == ""] <- NA
+summary(dirty_iris)
+```
+## Use complete.cases() to see which rows have missing values
+```{r}
+complete.cases(dirty_iris)
+```
+
+
+## Count missing values whole data
+```{r}
+sum(is.na(dirty_iris))
+```
+
+## Count missing values in a feature
+
+```{r}
+sum(is.na(dirty_iris$Sepal.Length))
+```
+# Find indices of NAs in Sepal.Length
+
+```{r}
+ind <- which(is.na(dirty_iris$Sepal.Length))
+ind
+```
+
+
+
+
+
+
+
+
+
+
+## Look at the full rows for records missing Sepal.Length
+```{r}
+dirty_iris[ind, ]
+```
+
+
+
+
+
+
+
+
+
+# Set Sepal.Length missing values to 0.5
+```{r}
+
+dirty_iris$Sepal.Length[ind] <- 0.5
+dirty_iris[ind, ]
+```
+
+# We can omit all rows with any missing values using na.omit() 
+```{r}
+na.omit(dirty_iris)
+```
+
+# Get index of row with -1 value
+
+```{r}
+m<-max(dirty_iris$Sepal.Length)
+ind0 <- which(dirty_iris$Sepal.Length ==m ) 
+print (ind0)
+dirty_iris$Sepal.Length[ind0]
+```
+
+
+
+
+
+## Your turn
+- Replace missing values in Sepal.Width by mean value
+```{r}
+#Calculate mean of the Sepal.Width values which are not NA
+mean_sepal_width <- mean(na.omit(dirty_iris)$Sepal.Width)
+mean_sepal_width
+#Replace the NA values with the mean value
+dirty_iris$Sepal.Width[ind] <- mean_sepal_width
+#Display data which used to have missing values in Sepal.Width column
+dirty_iris[ind, ]
+```
+- Replace Missing valuse in Petal.Length by max value
+```{r}
+#Index of missing values in Petal.Length
+ind2 <- which(is.na(dirty_iris$Petal.Length))
+#Calculate max of the Petal.Length values which are not NA
+max_petal_length <- max(na.omit(dirty_iris)$Petal.Length)
+max_petal_length
+#Replace the NA values with the max value
+dirty_iris$Petal.Length[ind2] <- max_petal_length
+#Display data which used to have missing values in Petal.Length column
+dirty_iris[ind2, ]
+```
+- Convert Species names into: setosa to "1", versicolor to "2" and virginica to "3"
+```{r}
+ind_setosa <- which(dirty_iris$Species == "setosa")
+dirty_iris$Species[ind_setosa] <- "1"
+
+ind_versicolor <- which(dirty_iris$Species == "versicolor")
+dirty_iris$Species[ind_versicolor] <- "2"
+
+ind_virginica <- which(dirty_iris$Species == "virginica")
+dirty_iris$Species[ind_virginica] <- "3"
+
+dirty_iris$Species
+```
+- Normalise Sepal.Width by Min-Max: Sepal.Width= Sepal.Width - min / max -min
+```{r}
+min_sepal_width <- min(na.omit(dirty_iris)$Sepal.Width)
+min_sepal_width
+max_sepal_width <- max(na.omit(dirty_iris)$Sepal.Width)
+max_sepal_width
+
+differance = max_sepal_width - min_sepal_width
+
+dirty_iris$Normalized.Min.Max <- (dirty_iris$Sepal.Width - min_sepal_width)/differance
+
+dirty_iris$Normalized.Min.Max
+```
+- Normalise Sepal.Width Z score: Sepal.Width= (Sepal.Width- mean)/std
+```{r}
+mean_sepal_width <- min(na.omit(dirty_iris)$Sepal.Width)
+mean_sepal_width
+std_sepal_width <- sd(na.omit(dirty_iris)$Sepal.Width)
+std_sepal_width
+
+dirty_iris$Normalized.Z <- (dirty_iris$Sepal.Width - mean_sepal_width)/std_sepal_width
+
+dirty_iris$Normalized.Z
+```
+
+```{r}
+dirty_iris
+```
+

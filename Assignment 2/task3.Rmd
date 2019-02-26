@@ -1,0 +1,103 @@
+---
+title: "task3"
+author: "Anna Palmqvist Sjövall"
+date: "11 oktober 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Implement data visualisation methods
+
+## Use iris dataset in R. 
+```{r}
+library(datasets)
+head(iris)
+```
+
+## Create a histogram for Versicolor Petal widths.
+```{r}
+subset_ve <- subset(iris, iris$Species == "versicolor")$Petal.Width
+hist(subset_ve, xlab="Petal.Width", main="Histogram for Versicolor Petal widths")
+```
+
+## Create a histogram for Setosa Petal widths.
+```{r}
+subset_se <- subset(iris, iris$Species == "setosa")$Petal.Width
+hist(subset_se, xlab="Petal.Width", main="Histogram for Setosa Petal widths")
+```
+
+## Create a histogram for Virginica Petal widths. 
+```{r}
+subset_vi <- subset(iris, iris$Species == "virginica")$Petal.Width
+hist(subset_vi, xlab="Petal.Width", main="Histogram for Virginica Petal widths")
+```
+
+## Create bar charts for minimum, maximum, median and average of Virginica Petal widths.
+```{r}
+max <- max(subset_vi) 
+min <- min(subset_vi)
+median <- median(subset_vi)
+average <- mean(subset_vi)
+
+bar_names <- c('min', 'max', 'median', 'average')
+barplot(c(min, max, median, average), names.arg=bar_names, main="Bar chart for Virginica Petal Widths")
+
+```
+
+## Create a bar chart for each category in Sepal length. 
+The data of first category should be between the minimum value and the average value. The data of second category should be between the minimum value and the median value. The data of third category should be between the average value and the maximum value.
+```{r}
+#Returns the amount of values in the data that is between less and more.
+amount_of_between <- function(col, less, more) {
+  length(col[which(less < col & col < more)])
+}
+
+#Returns a bar chart of the data for specie.
+bar_chart <- function(data, specie) {
+  bar_names <- c("min avg", "min med", "med max")
+  main_name <- paste("Sepal length: ", specie)
+
+  max <- max(data)
+  min <- min(data)
+  median <- median(data)
+  average <- mean(data)
+  
+  min_avg <- amount_of_between(data, min, average)
+  min_med <- amount_of_between(data, min, median)
+  med_max <- amount_of_between(data, median, max)
+    
+  barplot(c(min_avg, min_med, med_max), main=main_name, names.arg = bar_names)
+}
+
+#Gets name of species
+names_specie <- unique(iris$Species)
+
+for(i in 1:length(names_specie)){
+  bar_chart(iris[which(iris$Species == names_specie[i]),]$Sepal.Length, names_specie[i])
+}
+```
+
+## Create a pie chart for each category in Petal length. 
+The data of each category should be between the average value and the maxmimum value.
+```{r}
+mean <- mean(iris$Petal.Length)
+max <- max(iris$Petal.Length)
+
+data <- subset(iris, mean < Petal.Length  & Petal.Length < max)
+
+pie(table(data$Species))
+```
+
+## Create separate Box Plots for each category in Sepal widths.
+```{r}
+set <- subset(iris, Species == names_specie[1])$Sepal.Width
+ver <- subset(iris, Species == names_specie[2])$Sepal.Width
+vir <- subset(iris, Species == names_specie[3])$Sepal.Width
+
+boxplot(set, ver, vir, xlab="Sepal Width", names=names_specie)
+
+```
+

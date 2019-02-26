@@ -1,0 +1,74 @@
+---
+title: "task1"
+author: "Anna Palmqvist Sjövall"
+date: "11 oktober 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Develop a Discriminant Analysis mode
+## Use Iris dataset in R.
+```{r}
+library(datasets)
+head(iris)
+```
+
+## Use sepal length and sepal width columns ONLY as 2 independent variables (X1 and X2) and last column as the response variable Y.
+```{r}
+data <- data.frame(X1 = iris$Sepal.Length, X2 = iris$Sepal.Width, Y = iris$Species)
+```
+
+## The dataset set has three categories (setosa, versicolor and virginica). Use setosa and versicolor ONLY. You need to REMOVE virginica rows.
+```{r}
+data <- subset(data, data$Y != "virginica")
+```
+
+## Discriminant Analysis
+```{r}
+#Split data into two classes- setosa and versicolor
+c1<- data[data$Y=='setosa',]
+c2<- data[data$Y=='versicolor',]
+
+#Calculate the mean (average) vectors, covariance matrices and class probabilities. (X is Sepal length and width, Y is Species).
+#c1
+n1 <- length(c1$Y)
+c1_P <- n1/length(data$Y)
+c1_uX1 <- mean(c1$X1)
+c1_uX2 <- mean(c1$X2)
+c1_cov <- cov(c1[, 1:2])
+
+#c2
+n2 <- length(c2$Y)
+c2_P <- n2/length(data$Y)
+c2_uX1 <- mean(c2$X1)
+c2_uX2 <- mean(c2$X2)
+c2_cov <- cov(c2[, 1:2])
+
+#Calculate the pooled covariance matrix and the coefficients of the model.
+c <- (1 / (n1 + n2))*((n1*c1_cov) + (n2*c2_cov))
+b <- solve(c)%*%(c(c1_uX1, c1_uX2) - c(c2_uX1, c2_uX2))
+z <- (b[1,1]*data$X1) + (b[2,1]*data$X2)
+data$Z <- z
+
+#Calculate Z0
+z0 <- (b[1,1]*((c1_uX1 + c2_uX1)/2)) + (b[2,1]*((c1_uX2 + c2_uX2)/2))
+l <- -log(c1_P/c2_P)
+data$Y_est <-ifelse(z-z0 > l, 'setosa','versicolor')
+data['Z-Z0'] <- z - z0
+```
+
+
+## Display results and Print the final Accuracy.
+```{r}
+#results
+data
+
+#accuracy= (No. of correct / Total)*100. 
+correct <- sum(data$Y == data$Y_est)
+accuracy <- (correct / length(data$Y))*100
+accuracy
+```
+

@@ -1,0 +1,111 @@
+---
+title: "Lab 5 - Task 1"
+author: "Anna Palmqvist Sjövall"
+date: "30 augusti 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=15)
+```
+
+## 2. Load house_data from you working directory (folder). Consider "sqft_living" as X and "price" as Y
+
+```{r}
+# upload data
+data <- read.csv("house_data.csv", header=TRUE, stringsAsFactors=FALSE)
+X <- data$sqft_living
+Y <- data$price
+head(data)
+```
+
+# 3. Plot X versus Y: plot (x, y).
+```{r}
+plot(X,Y)
+```
+
+# 4. Calculate average of X and average of Y: mean (X), mean (Y)
+```{r}
+X_avg <- mean(X)
+Y_avg <- mean(Y)
+X_avg
+Y_avg
+```
+
+#5/6. Calculate X - mean (X) and Y - mean (Y)
+```{r}
+X_fac <- X - X_avg
+data["X - mean(X)"] <- X_fac
+Y_fac <- Y - Y_avg
+data["Y - mean(Y)"] <- Y_fac
+head(data)
+```
+
+#7. Calculate (X - mean (X)) * (Y - mean (Y))
+```{r}
+XY <-X_fac * Y_fac
+data["(X - mean (X)) * (Y - mean (Y))"] <- XY
+head(data)
+```
+
+#8. Calculate sum of ((X - mean (X)) * (Y - mean (Y)))
+```{r}
+XY_sum <- sum(XY)
+XY_sum
+```
+
+#9. Calculate (X - mean (X)) ^2
+```{r}
+X_sq <- X_fac ^ 2
+data["(X - mean (X)) ^2"] <- X_sq
+head(data)
+```
+
+#10. Calculate sum of ((X - mean (X)) ^2)
+```{r}
+X_sum <- sum(X_sq)
+X_sum
+```
+
+#11. Calculate ??1: ??1=Divide Step 8 by Step 10
+```{r}
+beta1 <- XY_sum / X_sum
+beta1
+```
+
+#12. Calculate ??0: ??0= mean (Y) - ??1 * mean (X)
+```{r}
+beta0 <- Y_avg - beta1*X_avg
+beta0
+```
+
+#13. Calculate Yest= ??0 + ??1 * X
+```{r}
+Y_est <- beta0 + beta1*X
+head(Y_est)
+```
+
+#14. Display the Yest as follows
+```{r}
+table <- data.frame(sqft_living_X=X, price_Y=Y, Y_est=Y_est)
+head(table)
+```
+
+#15. Calculate the error: Error= price Y- Yest
+```{r}
+table["Error= price Y - Y_est"] <- Y - Y_est
+head(table)
+```
+
+#16. Calculate Root Mean Squared Error (RMSE):
+```{r}
+RMSE <- sqrt(sum((Y_est - Y)^2) / length(Y))
+RMSE
+```
+
+#Display Result
+```{r}
+plot (X,Y)
+lines(X, Y_est)
+```

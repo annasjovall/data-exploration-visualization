@@ -1,0 +1,101 @@
+---
+title: "Lab 4 - Task 2"
+author: "Anna Palmqvist Sjövall"
+date: "23 augusti 2018"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **CSE5DEV**
+
+This lab coveres Lecture 4 - Applying PCA steps on USArrests dataset.
+
+
+## Load the USArrests dataset
+
+```{r}
+# The datasets package needs to be loaded to access our data 
+# For a full list of these datasets, type library(help = "datasets")
+library(datasets)
+data(USArrests)
+head(USArrests)
+```
+
+## Make a copy of the data set: copy_us
+```{r}
+copy_us <- cbind(USArrests)
+#Check so it doesn't reference the same memory space
+tracemem(copy_us)==tracemem(USArrests)
+head(copy_us)
+```
+
+## Normalise the dataset: X=x-mean(x) /Sd(x)
+```{r}
+normalize <- function(x) {
+  return ((x-mean(x))/sd(x))
+}
+copy_us <- as.data.frame(lapply(copy_us, normalize))
+head(copy_us)
+```
+
+## Calculate the covariance matrix of the normalise the dataset: In R use Cor
+```{r}
+covariance_matrix <- cor(copy_us)
+covariance_matrix
+```
+
+## Find out the eigenvectors and eigenvalues using the covariance matrix:
+```{r}
+e <- eigen(covariance_matrix)
+eigen_value <- e$values
+eigen_vector <- e$vectors
+
+eigen_value
+eigen_vector
+```
+
+## Sort eigenvalues in descending order.
+```{r}
+#eigen() does this
+```
+
+## Calculate the Explained Variance = eigenvalue/sum(eigenvalues)
+```{r}
+exp_var <- eigen_value / sum(e$values)
+exp_var
+```
+
+## Calculate the Cumulative Variance= Explained Variance (PCA1), Explained Variance (PCA1+PCA2), Explained Variance (PCA1+PCA2+PCA3), Explained Variance (PCA1+PCA2+PCA3+PCA4).
+```{r}
+cum_var <- c(exp_var[1], sum(exp_var[c(1,2)]), sum(exp_var[-4]), sum(exp_var)) 
+cum_var
+```
+
+## Choose the best eigenvectors (the best two vectors) that correspond to the best largest eigenvalues (the best two eigenvalues). The best two that can lead to 90% or more based on the Cumulative Variance.
+```{r}
+best_eigen_70 <- eigen_vector[, c(1,2)]
+best_eigen_90 <- eigen_vector[, c(1,2,3)]
+best_eigen_70
+best_eigen_90
+```
+
+## Construct the projection matrix W from the selected two eigenvectors: W=DotProduct (Normalise_dataset, selected two eigenvectors) - in R: W=Normalise_dataset %*% selected eigenvectors.
+```{r}
+W70 <- data.matrix(copy_us) %*% best_eigen_70
+W90 <- data.matrix(copy_us) %*% best_eigen_90
+```
+
+## Form the new data set in reduced dimensions- Added class label into W.
+```{r}
+W70 <- data.frame(W70)
+head(W70)
+
+W90 <- data.frame(W90)
+head(W90)
+```

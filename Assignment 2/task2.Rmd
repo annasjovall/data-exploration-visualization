@@ -1,0 +1,83 @@
+---
+title: "task2"
+author: "Anna Palmqvist Sjövall"
+date: "11 oktober 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Implement K-means Clustering Algorithm
+
+## Use iris dataset in R.
+```{r}
+library(datasets)
+head(iris)
+```
+
+## From iris dataset use only two columns: Petal.Length and Petal.Width 
+```{r}
+d <- iris[, c("Petal.Length", "Petal.Width")]
+```
+
+## Set K = 2. You need to partition the data into 2 clusters (K = 2). 
+```{r}
+k = 2
+```
+
+## Use the following as the initial centroid points: c1= (1.6, 0.2), c2= (4.6, 1.5).
+```{r}
+c1=c(1.6, 0.2)
+c2=c(4.6, 1.5)
+```
+
+## K-means clustering algorithm
+Each point is then assigned to the closest centroid based on the Euclidean distance
+```{r}
+#Returns euclidean between two vectors
+eucl_dist <- function(c, x) {
+  sqrt(sum((c-x)^2))
+}
+
+#Returns matrix of distances between point and centroid
+distance_matrix <- function(df, c) {
+  distances <- matrix(NA, nrow=dim(df)[1], ncol=dim(c)[1])
+  for(i in 1:dim(c)[1]) {
+    distances[,i] <- apply(df, 1, eucl_dist, c[i,])
+  }
+  distances
+}
+
+centroid <- rbind(c1, c2)
+dist <- distance_matrix(d, centroid)
+cluster <- apply(dist, 1, which.min)
+```
+
+The centroid of each cluster is then updated based on the points assigned to the cluster. Calculate the average of all points in each cluster to generate new centroid point.
+```{r}
+prev <- centroid
+centroid <- apply(d, 2, tapply, cluster, mean)
+```
+
+Repeat Step 2 (assignment) and Step 3 (update) until no point changes clusters, or equivalently, until the centroids remain the same.
+```{r}
+while(any(prev != centroid)) {
+  prev <- centroid
+
+  dist <- distance_matrix(d, prev)
+  cluster <- apply(dist, 1, which.min)
+  centroid <- apply(d, 2, tapply, cluster, mean)
+}
+```
+
+# Results
+```{r}
+d$cluster <- cluster
+d$species <- iris$Species
+d
+
+plot(d[,1:2], col=cluster, main="k-means clustering. The colors represent the different clusters.", pch=(as.numeric(d$species)*3))
+
+```

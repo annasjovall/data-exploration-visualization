@@ -1,0 +1,107 @@
+---
+title: "Lab 4 - Dimensionality Reduction"
+author: "Anna Palmqvist Sjövall"
+date: "23 augusti 2018"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **CSE5DEV**
+
+This lab coveres Lecture 4 - Applying PCA steps on iris dataset.
+
+
+
+## Load the iris dataset
+
+```{r}
+# The datasets package needs to be loaded to access our data 
+# For a full list of these datasets, type library(help = "datasets")
+library(datasets)
+data(iris)
+head(iris)
+```
+
+## Make a copy of the data set: copy_iris
+```{r}
+copy_iris <- cbind(iris)
+#Check so it doesn't reference the same memory space
+tracemem(copy_iris)==tracemem(iris)
+head(copy_iris)
+```
+
+## Remove last column (label feature or label class) from the dataset
+```{r}
+copy_iris <- copy_iris[, !((names(copy_iris) %in% "Species"))]
+head(copy_iris)
+```
+
+## Normalise the dataset: X=x-mean(x) /Sd(x)
+```{r}
+normalize <- function(x) {
+  return ((x-mean(x))/sd(x))
+}
+copy_iris <- as.data.frame(lapply(copy_iris, normalize))
+head(copy_iris)
+```
+
+## Calculate the covariance matrix of the normalise the dataset: In R use Cor
+```{r}
+covariance_matrix <- cor(copy_iris)
+covariance_matrix
+```
+
+## Find out the eigenvectors and eigenvalues using the covariance matrix:
+```{r}
+e <- eigen(covariance_matrix)
+eigen_value <- e$values
+eigen_vector <- e$vectors
+
+eigen_value
+eigen_vector
+```
+
+## Sort eigenvalues in descending order.
+```{r}
+#eigen() does this
+```
+
+## Calculate the Explained Variance = eigenvalue/sum(eigenvalues)
+```{r}
+exp_var <- eigen_value / sum(eigen_value)
+exp_var
+```
+
+## Calculate the Cumulative Variance= Explained Variance (PCA1), Explained Variance (PCA1+PCA2), Explained Variance (PCA1+PCA2+PCA3), Explained Variance (PCA1+PCA2+PCA3+PCA4).
+```{r}
+cum_var <- c(exp_var[1], sum(exp_var[c(1,2)]), sum(exp_var[-4]), sum(exp_var)) 
+cum_var
+```
+
+## Choose the best eigenvectors (the best two vectors) that correspond to the best largest eigenvalues (the best two eigenvalues). The best two that can lead to 90% or more based on the Cumulative Variance.
+```{r}
+best_eigen <- eigen_vector[, c(1,2)]
+best_eigen
+```
+
+## Construct the projection matrix W from the selected two eigenvectors: W=DotProduct (Normalise_dataset, selected two eigenvectors) - in R: W=Normalise_dataset %*% selected eigenvectors.
+```{r}
+dim(copy_iris)
+dim(best_eigen)
+W <- data.matrix(copy_iris) %*% best_eigen
+```
+
+## Form the new data set in reduced dimensions- Added class label into W.
+```{r}
+W <- data.frame(W)
+head(W)
+species <- iris[, "Species"]
+W$Species <- species
+W
+```

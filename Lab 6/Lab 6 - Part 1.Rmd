@@ -1,0 +1,66 @@
+---
+title: "Lab 6 - Part 1"
+author: "Anna Palmqvist Sjövall"
+date: "6 september 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 2. Load house_data from you working directory (folder). Consider "sqft_living" as X and "price" as Y
+```{r}
+# upload data
+data <- read.csv("house_data.csv", header=TRUE, stringsAsFactors=FALSE)
+X <- data$sqft_living
+Y <- data$price
+head(data)
+```
+
+# 3. Normalise house_data: X-Min(X)/Max(X)-Min(X), Y-Min(Y)/Max(Y)-Min(Y)
+```{r}
+X <- (X - min(X)) / (max(X) - min(X))
+Y <- (Y - min(Y)) / (max(Y) - min(Y))
+data$sqft_living <- X
+data$price <- Y
+head(data)
+```
+
+# 4. Use the following GDA steps:
+```{r}
+B_0 <- 0.45
+B_1 <- 0.75
+theta <- 0.01
+N <- length(Y)
+
+Y_est <- B_0 + (B_1*X)
+SSE <- 0.5*sum((Y-Y_est)^2)
+
+SSE_plot <- list(SSE)
+
+for (i in 1:500) {
+  SSE_B_0 <- sum((Y_est - Y))/N
+  SSE_B_1 <- sum((Y_est - Y)*X)/N
+  B_0 = B_0 - (theta*SSE_B_0)
+  B_1 = B_1 - (theta*SSE_B_1)
+  Y_est = B_0 + (B_1*X)
+  SSE = 0.5*sum((Y - Y_est)^2)
+  SSE_plot <- c(SSE_plot, SSE)
+}
+#Should I print Yest and SSE here?
+```
+
+# 5- Print SSE
+```{r}
+SSE
+```
+
+# 6- Display Plot (X, Y), Lines (X, Yest)
+```{r}
+plot(X, Y, ylim = range(c(Y, Y_est))) 
+lines(X,Y_est, col='red')
+plot(1:length(SSE_plot), SSE_plot, xlab = 'iteration', ylab = 'SSE', main = 'SSE value per iteration of GDE')
+
+```
+

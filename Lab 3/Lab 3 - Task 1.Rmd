@@ -1,0 +1,252 @@
+---
+title: "Lab 3"
+author: "CSE5DEV"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+
+## **Welcome to CSE5DEV**
+
+You need to download the R code files and datasets into your working folder (current directory)
+
+
+This lab will cover Lecture 2 and Lecture 3. 
+
+
+
+## Task 1- Lecture 2: Data exploration.
+
+We will perfrom the following stpes:
+
+-Summary and stats.
+
+-Explore Individual Variables.
+
+-Exploration of multiple variables.
+
+## Code chunks
+
+## Load the iris dataset
+
+The "iris" dataset will be used for Data exploration. 
+
+```{r}
+# The datasets package needs to be loaded to access our data 
+# For a full list of these datasets, type library(help = "datasets")
+library(datasets)
+data(iris)
+```
+
+
+
+## Or we can upload the dataset from the working folder (directory)
+
+```{r}
+mydata <- read.csv("iris.csv", header=TRUE)
+head(mydata)
+```
+
+## Display the Size of Data
+```{r}
+dim(iris)
+```
+## Display features (columns) names
+```{r}
+names(iris)
+```
+
+## Calculate number of rows in a dataset
+```{r}
+nrow(iris) 
+```
+
+## Calculate number of columns in a dataset
+```{r}
+ncol(iris) 
+```
+
+
+## Display the structure Of data
+```{r}
+str(iris)
+```
+
+## Display attributes of data
+```{r}
+attributes(iris)
+```
+
+## Display the first three rows of data
+```{r}
+iris[1:3, ]
+```
+
+## Display head of data - first three rows
+```{r}
+head(iris, 3)
+```
+## Display tail of data - last three rows
+```{r}
+tail(iris, 3)
+```
+
+## Display a single feature (Column)
+```{r}
+#The first 10 values of Sepal.Length
+iris[1:10, "Sepal.Length"]
+#or
+iris$Sepal.Length[1:10]
+```
+
+## Summary of Data
+```{r}
+summary(iris)
+```
+## Calculate range, minimum, maximum, mean, median, std and the firrst (25%) and third (75%) quartiles for numeric variables.
+```{r}
+range(iris$Sepal.Length)
+min(iris$Sepal.Length)
+max(iris$Sepal.Length)
+mean(iris$Sepal.Length)
+median(iris$Sepal.Length)
+sd(iris$Sepal.Length)
+quantile(iris$Sepal.Length)
+```
+## Calculate Variance
+```{r}
+var(iris$Sepal.Length)
+```
+
+## Calculate Frequency for categorical variables
+```{r}
+table(iris$Species)
+```
+## Calculate Covariance of two variables
+```{r}
+cov(iris$Sepal.Length, iris$Petal.Length)
+```
+
+## Calculate Correlation of two variables
+```{r}
+cor(iris$Sepal.Length, iris$Petal.Length)
+```
+
+
+
+
+## Plot Sepal.Length vs Sepal.Width
+```{r}
+plot(iris$Sepal.Length, iris$Sepal.Width)
+```
+## Plot  Sepal.Length only
+```{r}
+plot(iris$Sepal.Length)
+```
+
+
+
+```{r}
+##
+```
+
+## Your turn
+
+Try creating a code chunk here to do the following steps:
+
+- Perform all above steps for 1) Sepal.Width, 2) Petal.Length  and  3) Petal.Width 
+-> 1) Sepal.Width
+```{r}
+#The first 10 values of Sepal.Width
+iris[1:10, "Sepal.Width"]
+```
+```{r}
+## Calculate range, minimum, maximum, mean, median, std and the firrst (25%) and third (75%) quartiles for numeric variables.
+range(iris$Sepal.Width)
+min(iris$Sepal.Width)
+max(iris$Sepal.Width)
+mean(iris$Sepal.Width)
+median(iris$Sepal.Width)
+sd(iris$Sepal.Width)
+quantile(iris$Sepal.Width)
+```
+```{r}
+## Calculate Variance
+var(iris$Sepal.Width)
+```
+```{r}
+## Plot  Sepal.Width only
+plot(iris$Sepal.Width)
+```
+
+
+-> 2) Petal.Length
+```{r}
+#The first 10 values of Petal.Length
+iris[1:10, "Petal.Length"]
+```
+```{r}
+## Calculate range, minimum, maximum, mean, median, std and the firrst (25%) and third (75%) quartiles for numeric variables.
+range(iris$Petal.Length)
+min(iris$Petal.Length)
+max(iris$Petal.Length)
+mean(iris$Petal.Length)
+median(iris$Petal.Length)
+sd(iris$Petal.Length)
+quantile(iris$Petal.Length)
+```
+```{r}
+## Calculate Variance
+var(iris$Petal.Length)
+```
+```{r}
+## Plot Petal.Length only
+plot(iris$Petal.Length)
+```
+
+
+-> 3) Petal.Width
+```{r}
+#The first 10 values of Petal.Width
+iris[1:10, "Petal.Width"]
+```
+```{r}
+## Calculate range, minimum, maximum, mean, median, std and the firrst (25%) and third (75%) quartiles for numeric variables.
+range(iris$Petal.Width)
+min(iris$Petal.Width)
+max(iris$Petal.Width)
+mean(iris$Petal.Width)
+median(iris$Petal.Width)
+sd(iris$Petal.Width)
+quantile(iris$Petal.Width)
+```
+```{r}
+## Calculate Variance
+var(iris$Petal.Width)
+```
+```{r}
+## Plot Petal.Width only
+plot(iris$Petal.Width)
+```
+
+
+- Calculate Covariance and Correlation for Petal.Length  vs Petal.Width
+```{r}
+## Covariance
+cov(iris$Petal.Length, iris$Petal.Width)
+## Correlation
+cor(iris$Petal.Length, iris$Petal.Width)
+```
+- Plot Petal.Length  vs Petal.Width
+```{r}
+plot(iris$Petal.Length, iris$Petal.Width)
+```
